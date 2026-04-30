@@ -21,6 +21,10 @@ def run_researcher(topic:str) -> str:
     # Initialize the search tool (reads SERPER_API_KEY from environment)
     search_tool = SerperDevTool(n_results=20)
     
+    
+    print(f"GEMINI_API_KEY present: {bool(os.getenv('GEMINI_API_KEY'))}")
+    print(f"SERPER_API_KEY present: {bool(os.getenv('SERPER_API_KEY'))}")
+    
     # Configure Gemini LLM with web search enabled
     gemini_llm = LLM(
         model="openai/gemini-3.1-flash-lite-preview",
