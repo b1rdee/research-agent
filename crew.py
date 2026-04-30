@@ -104,6 +104,7 @@ def run_researcher(topic:str) -> str:
         agents=[researcher, writer],
         tasks=[research_task, write_task],
         process=Process.sequential
+        memory=False
     )
 
     result = crew.kickoff(inputs={"topic": topic})
