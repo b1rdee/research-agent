@@ -27,14 +27,15 @@ def run_researcher(topic:str) -> str:
     
     # Configure Gemini LLM with web search enabled
     gemini_llm = LLM(
-        model="openai/gemini-3.1-flash-lite-preview",
+        model="gemini-3.1-flash-lite-preview",
+        #model="openai/gemini-3.1-flash-lite-preview",
         #model="gemini/gemini-2.0-flash",
         #model="gemini/gemini-3-flash-preview",
         #model="gemini/gemini-3.1-flash-lite-preview",
         #model="gemini/gemini-3-flash-preview",
         #model="gemini-3.1-pro-preview",
         api_key=os.getenv("GEMINI_API_KEY"),
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        #base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
         temperature=0.7
     )
     
