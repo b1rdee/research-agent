@@ -4,8 +4,10 @@
 
 **Ask Birdy** is a Streamlit-based web application that researches any topic you ask. It uses two AI agents (Researcher and Writer) powered by **CrewAI** and **Google Gemini** to find up-to-date information via web search (Serper API) and produce a detailed, well‑structured summary.
 
-👉 **Live demo (GitHub‑built version):** [https://your-railway-app.up.railway.app](https://your-railway-app.up.railway.app)  
-*(Replace with your actual Railway URL)*
+👉 **Live demo (GitHub‑built version):** https://research-agent-df-production-0e06.up.railway.app/
+
+👉 **Live demo (pre-built image push version):** https://research-agent-production-42cb.up.railway.app/
+
 
 ---
 
@@ -42,8 +44,8 @@
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/ask-birdy.git
-   cd ask-birdy
+   git clone https://github.com/b17dyE/research-agent.git
+   cd research-agent
 2.  **Set up environment variables**
 
 Create a .env file:
@@ -59,18 +61,20 @@ SERPER_API_KEY=your_serper_key_here
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
-Open http://localhost:8501 (or http://localhost:7860 with Docker).
+Open http://localhost:8501
 ```
 
 4. **Run with Docker (test the container)**
 
 ```bash
-docker build -t ask-birdy .
-docker run -p 7860:7860 ask-birdy
+docker build -t research-agent .
+docker run -p 7860:7860 research-agent
 Then visit http://localhost:7860.
 ```
 
-📦 Deployment on Railway – Two Methods
+---
+
+# Deployment on Railway – Two Methods
 Railway offers two industry‑standard ways to deploy a Dockerised app.
 
 **Method 1: Git‑Based Deployment (CI/CD) – Recommended for active development**
@@ -96,24 +100,24 @@ Railway offers two industry‑standard ways to deploy a Dockerised app.
 - Build your Docker image locally:
 
 ```bash
-docker build -t ask-birdy .
+docker build -t research-agent .
 ```
 - Tag it for your registry (using Docker Hub as an example):
 
 
 ```bash
-docker tag ask-birdy YOUR_DOCKER_USERNAME/ask-birdy:latest
+docker tag research-agent YOUR_DOCKER_USERNAME/research-agent:latest
 ```
 - Push to Docker Hub:
 
 
 ```bash
-docker push YOUR_DOCKER_USERNAME/ask-birdy:latest
+docker push YOUR_DOCKER_USERNAME/research-agent:latest
 ```
 
 - On Railway, create a new project → Deploy from Docker Image.
 
-- Enter the image name (e.g., YOUR_DOCKER_USERNAME/ask-birdy:latest).
+- Enter the image name (e.g., YOUR_DOCKER_USERNAME/research-agent:latest).
 
 - Add the same environment variables in the Variables tab.
 
@@ -123,7 +127,9 @@ docker push YOUR_DOCKER_USERNAME/ask-birdy:latest
 
 Both methods produce a live, publicly accessible agent. The Git‑based method is simpler for ongoing development; the image‑based method is useful for distributing a pre‑built artifact.
 
-🧠 **How It Works (Agent Flow)**
+---
+
+# How It Works (Agent Flow)
 
 - User enters a topic in the Streamlit interface.
 
@@ -135,10 +141,12 @@ Both methods produce a live, publicly accessible agent. The Git‑based method i
 
 - Orchestration is handled by CrewAI (sequential process).
 
-📁 **Project Structure**
+--- 
+
+# Project Structure
 
 ```text
-ask-birdy/
+research-agent/
 ├── app.py               # Streamlit frontend
 ├── crew.py              # CrewAI agents, tasks, and Gemini LLM setup
 ├── requirements.txt     # Python dependencies
