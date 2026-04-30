@@ -44,7 +44,7 @@
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/b17dyE/research-agent.git
+   git clone https://github.com/b1rdee/research-agent.git
    cd research-agent
 2.  **Set up environment variables**
 
