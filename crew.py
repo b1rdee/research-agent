@@ -103,7 +103,7 @@ def run_researcher(topic:str) -> str:
     crew = Crew(
         agents=[researcher, writer],
         tasks=[research_task, write_task],
-        process=Process.sequential
+        process=Process.sequential,
         memory=False
     )
 
