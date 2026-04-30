@@ -75,8 +75,8 @@ def run_researcher(topic:str) -> str:
         role="Content Writer",
         goal="Write a clear,simple to understand structured detail of the research. Aim for a length of at least 500 words",
         backstory="You turn research into engaging content. Only use the information provided by the researcher.",
-        #llm=gemini_llm,
-        llm=local_llm,
+        llm=gemini_llm,
+        #llm=local_llm,
         verbose=True
     )
     
