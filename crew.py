@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import google.genai as genai
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai_tools import SerperDevTool
+import pytz
 from datetime import datetime
 
 current_date=datetime.now().strftime("%B %d, %Y")
@@ -18,6 +19,11 @@ def run_researcher(topic:str) -> str:
     
     """Run the research crew and return the final summary."""
     
+    #---This run every time a user asks a question----
+    local_tz = pytz.timezone('Asia/Singapore')
+    current_date=datetime.now(local_tz).strftime("%B %d, %Y")
+    print(f"DEBUG: current_date_singapore = {current_date}")
+    
     # Initialize the search tool (reads SERPER_API_KEY from environment)
     search_tool = SerperDevTool(n_results=20)
     
@@ -26,29 +32,57 @@ def run_researcher(topic:str) -> str:
     print(f"SERPER_API_KEY present: {bool(os.getenv('SERPER_API_KEY'))}")
     
     # Configure Gemini LLM with web search enabled
-    gemini_llm = LLM(
-        #model="gemini-3.1-flash-lite-preview",
-        model="openai/gemini-3.1-flash-lite-preview",
-        #model="gemini/gemini-2.0-flash",
-        #model="gemini/gemini-3-flash-preview",
-        #model="gemini/gemini-3.1-flash-lite-preview",
-        #model="gemini/gemini-3-flash-preview",
-        #model="gemini-3.1-pro-preview",
-        api_key=os.getenv("GEMINI_API_KEY"),
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-        temperature=0.7
-    )
+    #gemini_llm = LLM(
+    #    #model="gemini-3.1-flash-lite-preview",
+    #    model="openai/gemini-3.1-flash-lite-preview",
+    #    #model="gemini/gemini-2.0-flash",
+    #    #model="gemini/gemini-3-flash-preview",
+    #    #model="gemini/gemini-3.1-flash-lite-preview",
+    #    #model="gemini/gemini-3-flash-preview",
+    #    #model="gemini-3.1-pro-preview",
+    #    api_key=os.getenv("GEMINI_API_KEY"),
+    #    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+    #    temperature=0.7
+    #)
     
-    local_llm = LLM(
-    model="ollama/llama3.2:3b",  # or "ollama/llama3.2", "ollama/qwen2.5", etc.
-    base_url="http://localhost:11434",  # Ollama's default address[citation:10]
-    temperature=0.7
-    )
-
+    #local_llm = LLM(
+    #model="ollama/llama3.2:3b",  # or "ollama/llama3.2", "ollama/qwen2.5", etc.
+    #base_url="http://localhost:11434",  # Ollama's default address[citation:10]
+    #temperature=0.7
+    #)
     
+    # Backend Selection
     
+    llm_backend = os.getenv("LLM_BACKEND","gemini")
+    
+    # Use your self-hosted Ollama (DeepSeek or other model)
+    if llm_backend == "ollama":
+        
+        # This line reads the value of the environment variable named OLLAMA_BASE_URL. 
+        # If that variable exists, it assigns its value to ollama_base. 
+        # If the variable does not exist, it assigns the fallback string "http://ollama.railway.internal:11434" instead.
+        ollama_base = os.getenv("OLLAMA_BASE_URL","http://ollama.railway.internal:11434") 
+        llm = LLM( 
+            #model="ollama/deepseek-r1:1.5b",   # Change to whatever model you pulled
+            #model="ollama/llama3.2:3b",   # Change to whatever model you pulled
+            #model="ollama/qwen2.5-coder:1.5b",
+            model="ollama/qwen2.5:3b",
+            base_url=ollama_base,
+            temperature=0.7,
+            #verbose = True
+            )
+    else:
+        
+        # Use Gemini (original configuration)
+        llm = LLM(
+            model="openai/gemini-3.1-flash-lite-preview",
+            api_key=os.getenv("GEMINI_API_KEY"),
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            temperature=0.7
+            )
+       
      # Create a Google GenAI client for web search
-    genai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+     # genai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     
     researcher = Agent(
         role="Senior Researcher",
@@ -66,7 +100,8 @@ def run_researcher(topic:str) -> str:
         
         
         #llm=gemini_llm,
-        llm=gemini_llm,
+        #llm=gemini_llm,
+        llm=llm,
         tools=[search_tool], #This gives the agent web search ability
         verbose=True
     )
@@ -75,8 +110,9 @@ def run_researcher(topic:str) -> str:
         role="Content Writer",
         goal="Write a clear,simple to understand structured detail of the research. Aim for a length of at least 500 words",
         backstory="You turn research into engaging content. Only use the information provided by the researcher.",
-        llm=gemini_llm,
+        #llm=gemini_llm,
         #llm=local_llm,
+        llm=llm,
         verbose=True
     )
     
@@ -104,7 +140,9 @@ def run_researcher(topic:str) -> str:
         agents=[researcher, writer],
         tasks=[research_task, write_task],
         process=Process.sequential,
-        memory=False
+        memory=False,
+        max_iter=10,
+        max_time = 180
     )
 
     result = crew.kickoff(inputs={"topic": topic})
