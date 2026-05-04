@@ -13,7 +13,7 @@ api = load_dotenv()
 
 api_keys = os.environ.get("GEMINI_API_KEY","not set")
 print(f"Using key starting with: {api_keys[:8]}...")
-#print(api)
+
 
 def run_researcher(topic:str) -> str:
     
@@ -81,8 +81,7 @@ def run_researcher(topic:str) -> str:
             temperature=0.7
             )
        
-     # Create a Google GenAI client for web search
-     # genai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+     
     
     researcher = Agent(
         role="Senior Researcher",
@@ -99,8 +98,7 @@ def run_researcher(topic:str) -> str:
         You NEVER report events that are in the future. You only list facts with sources that are from today or earlier.""",
         
         
-        #llm=gemini_llm,
-        #llm=gemini_llm,
+        
         llm=llm,
         tools=[search_tool], #This gives the agent web search ability
         verbose=True
@@ -110,8 +108,6 @@ def run_researcher(topic:str) -> str:
         role="Content Writer",
         goal="Write a clear,simple to understand structured detail of the research. Aim for a length of at least 500 words",
         backstory="You turn research into engaging content. Only use the information provided by the researcher.",
-        #llm=gemini_llm,
-        #llm=local_llm,
         llm=llm,
         verbose=True
     )
