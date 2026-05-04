@@ -2,11 +2,14 @@
 
 # 🔍 Ask Birdy – AI Research Agent
 
-**Ask Birdy** is a Streamlit-based web application that researches any topic you ask. It uses two AI agents (Researcher and Writer) powered by **CrewAI** and **Google Gemini** to find up-to-date information via web search (Serper API) and produce a detailed, well‑structured summary.
+****Ask Birdy** is a Streamlit-based web application that researches any topic you ask. It uses two AI agents (Researcher and Writer) powered by **CrewAI** and either **Google Gemini API (cloud)** or a **self‑hosted Ollama model (Qwen2.5 3B)** to find up‑to‑date information via web search (Serper API) and produce a detailed, well‑structured summary.
 
-👉 **Live demo (GitHub‑built version):** https://research-agent-df-production-0e06.up.railway.app/
+👉 **Live demo (GitHub‑built version-gemini):** https://research-agent-gh.up.railway.app
 
-👉 **Live demo (pre-built image push version):** https://research-agent-production-42cb.up.railway.app/
+👉 **Live demo (GitHub‑built version-ollama):** https://research-agent-ollama-gh.up.railway.app
+
+👉 **Live demo (pre-built image push version):** https://research-agent-dh.up.railway.app/
+
 
 
 ---
@@ -18,18 +21,19 @@
 - Real‑time progress streaming (optional)  
 - Dockerised – runs anywhere  
 - Two deployment options: **Git‑based CD** or **pre‑built image push**
+- **Two LLM backends** – switch between **Gemini API** (cloud) and **Ollama with Qwen2.5 3B** (self‑hosted) via a single environment variable
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer       | Technology                                                                 |
-|-------------|----------------------------------------------------------------------------|
-| Frontend    | [Streamlit](https://streamlit.io)                                          |
-| LLM & Agents| [CrewAI](https://docs.crewai.com) + [Google Gemini API](https://ai.google.dev/gemini-api) |
-| Web Search  | [Serper API](https://serper.dev)                                           |
-| Container   | Docker                                                                     |
-| Deployment  | [Railway](https://railway.app)                                             |
+| Layer              | Technology                                                                                   |
+|--------------------|----------------------------------------------------------------------------------------------|
+| Frontend           | [Streamlit](https://streamlit.io)                                                            |
+| LLM & Agents       | [CrewAI](https://docs.crewai.com) + [Google Gemini API](https://ai.google.dev/gemini-api) **or** [Ollama](https://ollama.com) with [Qwen2.5 3B](https://ollama.com/library/qwen2.5:3b) |
+| Web Search         | [Serper API](https://serper.dev) (Google Search)                                             |
+| Container          | Docker                                                                                       |
+| Deployment         | [Railway](https://railway.app) (two methods: Git‑based CI/CD or pre‑built image)             |
 
 ---
 
@@ -39,7 +43,8 @@
 
 - Python 3.9+
 - Docker (optional, but recommended)
-- API keys: [Gemini](https://aistudio.google.com/app/apikey) + [Serper](https://serper.dev)
+- API keys: [Gemini](https://aistudio.google.com/app/apikey) + [Serper](https://serper.dev) for Gemini backend
+-  **For Ollama backend:** [Install Ollama](https://ollama.com/download) and pull `qwen2.5:3b` (`ollama pull qwen2.5:3b`)
 
 1. **Clone the repository**
 
@@ -71,7 +76,29 @@ docker build -t research-agent .
 docker run -p 7860:7860 research-agent
 Then visit http://localhost:7860.
 ```
+# Switching between Gemini and Ollama Backends
 
+The same codebase supports both LLM backends. You control the backend via environment variables.
+
+| Backend          | Environment variables                                                                 |
+|------------------|---------------------------------------------------------------------------------------|
+| **Gemini** (default) | `LLM_BACKEND=gemini` (or not set) + `GEMINI_API_KEY`                                 |
+| **Ollama** (local)   | `LLM_BACKEND=ollama` + `OLLAMA_BASE_URL` (default `http://localhost:11434`)
+
+# Local development (Ollama)
+``` bash
+export LLM_BACKEND=ollama
+export OLLAMA_BASE_URL=http://localhost:11434
+streamlit run app.py
+```
+
+# On Railway
+
+- For the Gemini agent service: no LLM_BACKEND variable (or set to gemini), plus GEMINI_API_KEY.
+
+- For the Ollama agent service: set LLM_BACKEND=ollama and OLLAMA_BASE_URL=http://ollama.railway.internal:11434 (internal Railway hostname).
+
+### All other settings (search tool, agents, tasks) remain identical.
 ---
 
 # Deployment on Railway – Two Methods
